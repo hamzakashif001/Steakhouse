@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { ChevronDown } from 'lucide-react';
 import { site } from '@/data/site';
@@ -8,6 +9,19 @@ const ease = [0.22, 1, 0.36, 1] as const;
 
 export function Hero() {
   const reduce = useReducedMotion();
+  const [showVideo, setShowVideo] = useState(false);
+  const [videoReady, setVideoReady] = useState(false);
+
+  // Progressive enhancement: only load the hearth video on larger screens
+  // with motion allowed and no data-saver. Mobile / reduced-motion / save-data
+  // keep the lightweight steak still below.
+  useEffect(() => {
+    if (reduce) return;
+    const saveData = (navigator as Navigator & { connection?: { saveData?: boolean } })
+      .connection?.saveData;
+    const wide = window.matchMedia('(min-width: 1024px)').matches;
+    if (wide && !saveData) setShowVideo(true);
+  }, [reduce]);
 
   const rise = (delay: number) => ({
     initial: { opacity: 0, y: reduce ? 0 : 28 },
@@ -17,13 +31,35 @@ export function Hero() {
 
   return (
     <section id="top" className="relative h-[100svh] min-h-[640px] w-full overflow-hidden">
-      {/* Background image (Ken Burns). A <video> can be layered on top later. */}
+      {/* Background: steak still (always) with the hearth video enhancing it. */}
       <div className="absolute inset-0">
         <img
           src={images.heroPoster}
           alt="A hearth-charred, dry-aged ribeye resting under low light"
           className={`h-full w-full object-cover ${reduce ? '' : 'animate-ken-burns'}`}
         />
+        {showVideo && (
+          <video
+            className={`pointer-events-none absolute inset-0 h-full w-full object-cover transition-opacity duration-[1200ms] ease-luxe ${
+              videoReady ? 'opacity-100' : 'opacity-0'
+            }`}
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="auto"
+            poster="/images/hero-fire-poster.webp"
+            aria-hidden="true"
+            ref={(el) => {
+              if (el && el.readyState >= 2) setVideoReady(true);
+            }}
+            onLoadedData={() => setVideoReady(true)}
+            onCanPlay={() => setVideoReady(true)}
+            onPlaying={() => setVideoReady(true)}
+          >
+            <source src="/video/hero-fire.mp4" type="video/mp4" />
+          </video>
+        )}
       </div>
 
       {/* Cinematic overlays for depth + legibility */}
@@ -72,7 +108,6 @@ export function Hero() {
       {/* Scroll cue */}
       <motion.a
         href="#story"
-        aria-label="Scroll to story"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.6, duration: 1 }}

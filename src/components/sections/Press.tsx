@@ -21,7 +21,7 @@ export function Press() {
           {press.map((p, i) => (
             <Reveal key={p.source} delay={i * 0.08}>
               <figure className="flex h-full flex-col rounded-sm border border-white/10 bg-char/60 p-8">
-                <div className="mb-5 flex gap-1" aria-label={`${p.rating ?? 5} out of 5 stars`}>
+                <div className="mb-5 flex gap-1" role="img" aria-label={`${p.rating ?? 5} out of 5 stars`}>
                   {Array.from({ length: p.rating ?? 5 }).map((_, s) => (
                     <Star key={s} size={16} className="fill-brass text-brass" aria-hidden="true" />
                   ))}

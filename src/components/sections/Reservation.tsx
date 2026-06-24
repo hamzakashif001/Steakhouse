@@ -36,7 +36,7 @@ export function Reservation() {
   const uid = useId();
   const [form, setForm] = useState<FormState>(empty);
   const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({});
-  const [status, setStatus] = useState<'idle' | 'submitting' | 'success'>('idle');
+  const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
 
   const set = (k: keyof FormState, v: string) => {
     setForm((f) => ({ ...f, [k]: v }));
@@ -53,14 +53,35 @@ export function Reservation() {
     return e;
   };
 
-  const onSubmit = (ev: FormEvent) => {
+  // Optional real backend: set VITE_FORMSPREE_ID to a Formspree form id.
+  const formspreeId = import.meta.env.VITE_FORMSPREE_ID as string | undefined;
+
+  const onSubmit = async (ev: FormEvent) => {
     ev.preventDefault();
     const e = validate();
     setErrors(e);
     if (Object.keys(e).length) return;
     setStatus('submitting');
-    // Front-end showcase: simulate a request, then show confirmation.
-    window.setTimeout(() => setStatus('success'), 1100);
+
+    if (!formspreeId) {
+      // No backend configured — showcase mode: simulate, then confirm.
+      window.setTimeout(() => setStatus('success'), 1100);
+      return;
+    }
+
+    try {
+      const res = await fetch(`https://formspree.io/f/${formspreeId}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({
+          ...form,
+          _subject: `Reservation request — ${form.name} (${form.party})`,
+        }),
+      });
+      setStatus(res.ok ? 'success' : 'error');
+    } catch {
+      setStatus('error');
+    }
   };
 
   return (
@@ -278,6 +299,16 @@ export function Reservation() {
                     'Request Reservation'
                   )}
                 </Button>
+
+                {status === 'error' && (
+                  <p className="mt-4 text-center text-sm" role="alert" style={{ color: '#E0848C' }}>
+                    Something went wrong sending your request. Please call the house at{' '}
+                    <a href={site.phoneHref} className="underline">
+                      {site.phone}
+                    </a>
+                    .
+                  </p>
+                )}
               </form>
             )}
           </div>

@@ -37,7 +37,7 @@ export function Navbar() {
     >
       <nav className="container-luxe flex items-center justify-between py-4 md:py-5">
         {/* Wordmark */}
-        <a href="#top" className="group flex flex-col leading-none" aria-label={`${site.name} — home`}>
+        <a href="#top" className="group flex flex-col leading-none">
           <span className="font-serif text-2xl font-semibold tracking-wide text-bone md:text-[1.7rem]">
             Ember <span className="text-brass">&amp;</span> Oak
           </span>

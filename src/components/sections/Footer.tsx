@@ -54,10 +54,17 @@ export function Footer() {
             <p className="mb-4 text-xs uppercase tracking-[0.22em] text-brass">Visit</p>
             <p className="text-sm text-ash">{site.address.line1}</p>
             <p className="text-sm text-ash">{site.address.line2}</p>
-            <a href={site.phoneHref} className="mt-3 block text-sm text-ash hover:text-brass">
+            <a
+              href={site.phoneHref}
+              className="mt-2 inline-block py-1.5 text-sm text-ash hover:text-brass"
+            >
               {site.phone}
             </a>
-            <a href={`mailto:${site.email}`} className="block text-sm text-ash hover:text-brass">
+            <br />
+            <a
+              href={`mailto:${site.email}`}
+              className="inline-block py-1.5 text-sm text-ash hover:text-brass"
+            >
               {site.email}
             </a>
           </div>
