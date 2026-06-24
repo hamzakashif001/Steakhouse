@@ -44,7 +44,7 @@ const createClothMaterial = () =>
     transparent: true,
     uniforms: {
       map: { value: null },
-      opacity: { value: 1.0 },
+      opacity: { value: 0.0 },
       blurAmount: { value: 0.0 },
       scrollForce: { value: 0.0 },
       time: { value: 0.0 },
@@ -122,43 +122,24 @@ const createClothMaterial = () =>
   });
 
 function ImagePlane({
-  texture,
-  position,
-  scale,
   material,
+  registerMesh,
 }: {
-  texture: THREE.Texture;
-  position: [number, number, number];
-  scale: [number, number, number];
   material: THREE.ShaderMaterial;
+  registerMesh: (mesh: THREE.Mesh | null) => void;
 }) {
-  const meshRef = useRef<THREE.Mesh>(null);
-  const [isHovered, setIsHovered] = useState(false);
-
-  useEffect(() => {
-    if (material && texture) {
-      material.uniforms.map.value = texture;
-      const img = texture.image as { width?: number; height?: number } | undefined;
-      if (img?.width && img?.height) {
-        material.uniforms.texSize.value.set(img.width, img.height);
-      }
-    }
-  }, [material, texture]);
-
-  useEffect(() => {
-    if (material?.uniforms) {
-      material.uniforms.isHovered.value = isHovered ? 1.0 : 0.0;
-    }
-  }, [material, isHovered]);
-
+  // Position, scale, texture and uniforms are all driven imperatively from the
+  // parent's useFrame — this just creates a stable mesh and wires hover.
   return (
     <mesh
-      ref={meshRef}
-      position={position}
-      scale={scale}
+      ref={registerMesh}
       material={material}
-      onPointerEnter={() => setIsHovered(true)}
-      onPointerLeave={() => setIsHovered(false)}
+      onPointerEnter={() => {
+        material.uniforms.isHovered.value = 1.0;
+      }}
+      onPointerLeave={() => {
+        material.uniforms.isHovered.value = 0.0;
+      }}
     >
       <planeGeometry args={[1, 1, 20, 20]} />
     </mesh>
@@ -213,15 +194,22 @@ function GalleryScene({
   const totalImages = normalizedImages.length;
   const depthRange = DEFAULT_DEPTH_RANGE;
 
-  const planesData = useRef<PlaneData[]>([]);
-  useEffect(() => {
-    planesData.current = Array.from({ length: visibleCount }, (_, i) => ({
+  const meshRefs = useRef<(THREE.Mesh | null)[]>([]);
+
+  const makePlanes = (): PlaneData[] =>
+    Array.from({ length: visibleCount }, (_, i) => ({
       index: i,
       z: visibleCount > 0 ? ((depthRange / Math.max(visibleCount, 1)) * i) % depthRange : 0,
       imageIndex: totalImages > 0 ? i % totalImages : 0,
       x: spatialPositions[i]?.x ?? 0,
       y: spatialPositions[i]?.y ?? 0,
     }));
+
+  // Populated immediately so meshes have positions on the very first frame.
+  const planesData = useRef<PlaneData[]>(makePlanes());
+  useEffect(() => {
+    planesData.current = makePlanes();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [depthRange, spatialPositions, totalImages, visibleCount]);
 
   // Keyboard nudges — only when the gallery region holds focus, and we never
@@ -338,38 +326,44 @@ function GalleryScene({
       }
       blur = Math.max(0, Math.min(blurSettings.maxBlur, blur));
 
+      const mesh = meshRefs.current[i];
       const material = materials[i];
-      if (material?.uniforms) {
-        material.uniforms.opacity.value = opacity;
-        material.uniforms.blurAmount.value = blur;
+      if (!mesh || !material?.uniforms) return;
+
+      // Swap texture (and rescale to its aspect) when this plane wraps to a new image.
+      const texture = textures[plane.imageIndex];
+      if (texture && material.uniforms.map.value !== texture) {
+        material.uniforms.map.value = texture;
+        const img = texture.image as { width?: number; height?: number } | undefined;
+        if (img?.width && img?.height) {
+          material.uniforms.texSize.value.set(img.width, img.height);
+          const aspect = img.width / img.height;
+          if (aspect > 1) mesh.scale.set(2 * aspect, 2, 1);
+          else mesh.scale.set(2, 2 / aspect, 1);
+        }
       }
+
+      mesh.position.set(plane.x, plane.y, plane.z - depthRange / 2);
+      material.uniforms.opacity.value = opacity;
+      material.uniforms.blurAmount.value = blur;
     });
   });
 
   if (normalizedImages.length === 0) return null;
 
+  // Meshes are created once; all motion/texture/uniform updates happen
+  // imperatively in useFrame above — no per-frame React re-renders.
   return (
     <>
-      {planesData.current.map((plane, i) => {
-        const texture = textures[plane.imageIndex];
-        const material = materials[i];
-        if (!texture || !material) return null;
-
-        const worldZ = plane.z - depthRange / 2;
-        const aspect = texture.image ? texture.image.width / texture.image.height : 1;
-        const scale: [number, number, number] =
-          aspect > 1 ? [2 * aspect, 2, 1] : [2, 2 / aspect, 1];
-
-        return (
-          <ImagePlane
-            key={plane.index}
-            texture={texture}
-            position={[plane.x, plane.y, worldZ]}
-            scale={scale}
-            material={material}
-          />
-        );
-      })}
+      {materials.map((material, i) => (
+        <ImagePlane
+          key={i}
+          material={material}
+          registerMesh={(m) => {
+            meshRefs.current[i] = m;
+          }}
+        />
+      ))}
     </>
   );
 }
