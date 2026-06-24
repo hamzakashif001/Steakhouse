@@ -81,7 +81,7 @@ steakhouse/
 | Token | Hex | Use |
 |---|---|---|
 | `obsidian` | `#0B0B0C` | page base |
-| `char` | `#15131400` → `#1A1818` | surfaces / cards |
+| `char` | `#141314` / `#1A1818` | surfaces / cards |
 | `oxblood` | `#7A1F2B` | primary accent |
 | `oxblood-deep` | `#591521` | hovers / depth |
 | `brass` | `#C9A36A` | CTAs, hairlines, focus rings |
