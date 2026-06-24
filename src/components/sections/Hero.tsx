@@ -40,7 +40,7 @@ export function Hero() {
         />
         {showVideo && (
           <video
-            className={`pointer-events-none absolute inset-0 h-full w-full object-cover transition-opacity duration-[1200ms] ease-luxe ${
+            className={`pointer-events-none absolute inset-0 h-full w-full object-cover brightness-[0.55] transition-opacity duration-[1200ms] ease-luxe ${
               videoReady ? 'opacity-100' : 'opacity-0'
             }`}
             autoPlay
@@ -62,9 +62,10 @@ export function Hero() {
         )}
       </div>
 
-      {/* Cinematic overlays for depth + legibility */}
-      <div className="absolute inset-0 bg-gradient-to-b from-obsidian/70 via-obsidian/40 to-obsidian" />
-      <div className="absolute inset-0 bg-gradient-to-r from-obsidian/80 via-transparent to-transparent" />
+      {/* Cinematic overlays for depth + legibility (kept strong so hero text
+          stays readable even at the fire video's brightest frames) */}
+      <div className="absolute inset-0 bg-gradient-to-b from-obsidian/75 via-obsidian/45 to-obsidian" />
+      <div className="absolute inset-0 bg-gradient-to-r from-obsidian/90 via-obsidian/45 to-transparent" />
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_25%,rgba(11,11,12,0.65)_100%)]" />
 
       {/* Content */}
