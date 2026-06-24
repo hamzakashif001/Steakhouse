@@ -1,5 +1,13 @@
 import { Navbar } from '@/components/sections/Navbar';
 import { Hero } from '@/components/sections/Hero';
+import { Story } from '@/components/sections/Story';
+import { Menu } from '@/components/sections/Menu';
+import { Craft } from '@/components/sections/Craft';
+import { Gallery } from '@/components/sections/Gallery';
+import { PrivateDining } from '@/components/sections/PrivateDining';
+import { Reservation } from '@/components/sections/Reservation';
+import { Press } from '@/components/sections/Press';
+import { Footer } from '@/components/sections/Footer';
 
 export default function App() {
   return (
@@ -7,16 +15,15 @@ export default function App() {
       <Navbar />
       <main>
         <Hero />
-
-        {/* Placeholder beyond the fold so scroll + nav state can be tested.
-            Replaced by real sections in the next build phase. */}
-        <section
-          id="story"
-          className="flex min-h-[60vh] items-center justify-center border-t border-white/5 bg-char"
-        >
-          <p className="eyebrow">More sections coming next…</p>
-        </section>
+        <Story />
+        <Menu />
+        <Craft />
+        <Gallery />
+        <PrivateDining />
+        <Reservation />
+        <Press />
       </main>
+      <Footer />
     </>
   );
 }

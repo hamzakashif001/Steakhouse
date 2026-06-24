@@ -33,7 +33,7 @@ export const site = {
 } as const;
 
 export const stats = [
-  { value: 45, suffix: ' days', label: 'In-house dry-aging' },
+  { value: 45, suffix: ' days', label: 'Minimum dry-age' },
   { value: 1100, suffix: '°F', label: 'Coal-fired hearth' },
-  { value: 1907, prefix: 'Est. ', label: 'The ironworks' },
+  { value: 100, suffix: '%', label: 'Cascade-raised beef' },
 ] as const;

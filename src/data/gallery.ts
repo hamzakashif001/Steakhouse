@@ -1,19 +1,18 @@
-// Gallery image set for the 3D infinite gallery (and the fallback grid).
-const G = (id: string, w = 900, q = 70) =>
-  `https://images.unsplash.com/${id}?auto=format&fit=crop&fm=webp&w=${w}&q=${q}`;
-
+// Local, optimized WebP served same-origin from /public/images/gallery.
 export interface GalleryImage {
   src: string;
   alt: string;
 }
 
 export const galleryImages: GalleryImage[] = [
-  { src: G('photo-1600891964599-f61ba0e24092'), alt: 'Hearth-charred ribeye, sliced' },
-  { src: G('photo-1546833999-b9f581a1996d'), alt: 'Grilled steak with herbs' },
-  { src: G('photo-1558030006-450675393462'), alt: 'Steak searing over open flame' },
-  { src: G('photo-1544025162-d76694265947'), alt: 'Plated steak with garnish' },
-  { src: G('photo-1432139509613-5c4255815697'), alt: 'Dark, moody dining room' },
-  { src: G('photo-1559339352-11d035aa65de'), alt: 'Candlelit table setting' },
-  { src: G('photo-1504674900247-0877df9cc836'), alt: 'Chef plating a dish' },
-  { src: G('photo-1514516345957-556ca7d90a29'), alt: 'Whiskey pour at the bar' },
+  { src: '/images/gallery/g1.webp', alt: 'Hearth-charred steak, sliced on a board' },
+  { src: '/images/gallery/g2.webp', alt: 'Dry-aged steak carved tableside' },
+  { src: '/images/gallery/g3.webp', alt: 'Steak frites on dark walnut' },
+  { src: '/images/gallery/g4.webp', alt: 'Bone-in ribeye with red-wine reduction' },
+  { src: '/images/gallery/g5.webp', alt: 'Slow-smoked ribs on a carving board' },
+  { src: '/images/gallery/g6.webp', alt: 'The dining room at dusk' },
+  { src: '/images/gallery/g7.webp', alt: 'A candlelit table set for service' },
+  { src: '/images/gallery/g8.webp', alt: 'A smoked old fashioned at the bar' },
+  { src: '/images/gallery/g9.webp', alt: 'Whiskey poured over hand-cut ice' },
+  { src: '/images/gallery/g10.webp', alt: 'In the kitchen, prep underway' },
 ];
