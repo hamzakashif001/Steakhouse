@@ -23,6 +23,18 @@ export function Navbar() {
     };
   }, [open]);
 
+  // Close the drawer first (releasing the body scroll-lock), then scroll —
+  // otherwise the anchor jump fires while the body is locked and does nothing.
+  const goTo = (href: string) => {
+    setOpen(false);
+    const el = document.getElementById(href.replace('#', ''));
+    if (!el) return;
+    window.setTimeout(() => {
+      const y = el.getBoundingClientRect().top + window.scrollY - 72;
+      window.scrollTo({ top: y, behavior: 'smooth' });
+    }, 80);
+  };
+
   return (
     <motion.header
       initial={{ y: -40, opacity: 0 }}
@@ -89,7 +101,10 @@ export function Navbar() {
                 <a
                   key={item.href}
                   href={item.href}
-                  onClick={() => setOpen(false)}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    goTo(item.href);
+                  }}
                   className="border-b border-white/5 py-4 font-serif text-2xl text-bone/90 transition-colors hover:text-brass"
                 >
                   {item.label}
@@ -99,7 +114,10 @@ export function Navbar() {
                 href="#reserve"
                 size="lg"
                 className="mt-4 w-full"
-                onClick={() => setOpen(false)}
+                onClick={(e) => {
+                  e.preventDefault();
+                  goTo('#reserve');
+                }}
               >
                 Reserve a Table
               </ButtonLink>
